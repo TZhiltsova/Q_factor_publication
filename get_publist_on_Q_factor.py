@@ -2,7 +2,7 @@ import openpyxl
 from pybliometrics.scopus import ScopusSearch
 import pandas as pd
 import requests
-
+import os
 
 def q_filter(path, sheet_name, title_column, q_column, q_factor):
     """
@@ -87,11 +87,11 @@ def scopus_request_count(q_required, key_path):
 
 
 purpose = input('What do you need to find? (please, print data, count or both): ')
-path_to_file = input('Print path to initial file: ')
+path_to_file = input('Print name of initial file: ')
 sheet_name_in_file = input('Print sheet name: ')
 title_column_in_file = input('Print column with journal titles (A, B, C itc.): ')
 Q_column_in_file = input('Print column with Q factor (A, B, C itc.): ')
 Q_factor_in_file = input('Print required Q factor (Q1, Q2 itc.): ')
-path_output_to_file = 'final'
+path_output_to_file = os.getcwd()
 pab_year = input('Print publication year: ')
 q_filter(path_to_file, sheet_name_in_file, title_column_in_file, Q_column_in_file, Q_factor_in_file)
