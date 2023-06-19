@@ -27,8 +27,7 @@ def q_filter(path, sheet_name, title_column, q_column, q_factor):
     if purpose == 'data':
         scopus_request_data(q_required)
     elif purpose == 'count':
-        key_path = input('Print path to key: ')
-        scopus_request_count(q_required, key_path)
+        scopus_request_count(q_required)
     return
 
 
@@ -37,20 +36,30 @@ def scopus_request_data(q_required):
     :param q_required: list of all journals with required quartile
     :return: exel sheets with information about publication in required year
     """
+    print('data forming...')
+    with open(r'key.txt',
+              'r') as f:  # path to the file with your api key
+        key = f.read()
     output_data = []
     stuck = 80
+    t = 0
     n = len(q_required) // stuck + 1
     print('Request has been sent')
     for i in range(n):
         output_data.append(q_required[i * stuck:i * stuck + stuck])
+    print('sheet creation...')
     for elem in output_data:
         query_list = ''
         for srcid in elem:
+            t += 1
             query_list += srcid + ' '
         query = f'{query_list[0:len(query_list)-3]} AND pubyear is {pab_year} AND doctype(ar) OR doctype(re)'
-        export = rf'{path_output_to_file}export{pab_year}{output_data.index(elem)+1}.xlsx'
+        print(query)
+        fullquery = r'https://api.elsevier.com/content/search/scopus?start=0&count=1&query= ' + str(query) + '&apiKey=' \
+                    + str(key)
+        export = rf'export{pab_year}{output_data.index(elem)+1}.xlsx'
 
-        df = pd.DataFrame(pd.DataFrame(ScopusSearch(query, subscriber=False,
+        df = pd.DataFrame(pd.DataFrame(ScopusSearch(fullquery, subscriber=False,
                                                     verbose=True).results))
 
         df.to_excel(export, index=False)
@@ -92,6 +101,6 @@ sheet_name_in_file = input('Print sheet name: ')
 title_column_in_file = input('Print column with journal titles (A, B, C itc.): ')
 Q_column_in_file = input('Print column with Q factor (A, B, C itc.): ')
 Q_factor_in_file = input('Print required Q factor (Q1, Q2 itc.): ')
-path_output_to_file = os.getcwd()
+#path_output_to_file = os.getcwd()
 pab_year = input('Print publication year: ')
 q_filter(path_to_file, sheet_name_in_file, title_column_in_file, Q_column_in_file, Q_factor_in_file)
